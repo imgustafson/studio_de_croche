@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio de Crochê — Isabella Gustafson</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF6F0;
+    --warm: #F2E8D9;
+    --rose: #C97B6A;
+    --rose-light: #E8A898;
+    --rose-dark: #A85A4A;
+    --sage: #7A9E8A;
+    --sage-light: #A8C4B4;
+    --brown: #5C3D2E;
+    --text: #3A2820;
+    --text-light: #7A6058;
+    --white: #FFFFFF;
+    --shadow: rgba(92, 61, 46, 0.12);
+    --nav-w: 250px;
+    --nav-collapsed: 64px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; display: flex; }
+
+  /* ===== SIDEBAR NAV ===== */
+  nav {
+    width: var(--nav-w); min-height: 100vh; background: var(--white);
+    box-shadow: 2px 0 16px var(--shadow); position: fixed; left: 0; top: 0;
+    display: flex; flex-direction: column; z-index: 50; padding: 1.2rem 0.8rem;
+    transition: width 0.3s ease; overflow: hidden;
+  }
+  nav.collapsed { width: var(--nav-collapsed); }
+  .nav-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 2px solid var(--warm);
+    min-height: 48px;
+  }
+  nav.collapsed .nav-top { justify-content: center; }
+  .nav-brand { display: flex; align-items: center; gap: 0.6rem; overflow: hidden; white-space: nowrap; }
+  .nav-brand .yarn { font-size: 1.6rem; flex-shrink: 0; }
+  .nav-brand-text { overflow: hidden; transition: opacity 0.2s, width 0.3s; }
+  .nav-brand-text h2 { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--brown); line-height: 1.2; }
+  .nav-brand-text span { font-size: 0.72rem; color: var(--text-light); }
+  nav.collapsed .nav-brand { display: none; }
+  .nav-toggle {
+    background: none; border: none; cursor: pointer; font-size: 1.1rem;
+    color: var(--text-light); padding: 0.3rem; border-radius: 8px;
+    transition: background 0.2s; flex-shrink: 0;
+  }
+  .nav-toggle:hover { background: var(--cream); color: var(--brown); }
+  nav.collapsed .nav-toggle { margin: 0 auto; }
+  .nav-links { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; }
+  .nav-link {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.7rem 0.8rem; border-radius: 12px; cursor: pointer;
+    color: var(--text-light); font-size: 0.9rem; font-weight: 500;
+    transition: all 0.2s; border: none; background: none; text-align: left; width: 100%;
+    white-space: nowrap; overflow: hidden;
+  }
+  .nav-link:hover { background: var(--cream); color: var(--brown); }
+  .nav-link.active { background: var(--rose); color: var(--white); box-shadow: 0 4px 12px rgba(201,123,106,0.3); }
+  .nav-link .icon { font-size: 1.1rem; width: 1.4rem; text-align: center; flex-shrink: 0; }
+  .nav-link .label { transition: opacity 0.2s; }
+  nav.collapsed .nav-link .label { opacity: 0; width: 0; overflow: hidden; }
+  nav.collapsed .nav-link { justify-content: center; padding: 0.7rem; }
+  .nav-footer { font-size: 0.75rem; color: var(--text-light); text-align: center; padding-top: 1rem; border-top: 1px solid var(--warm); white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+  nav.collapsed .nav-footer { opacity: 0; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    nav { transform: translateX(-100%); transition: transform 0.3s ease, width 0.3s ease; width: var(--nav-w) !important; }
+    nav.open { transform: translateX(0); }
+    nav.collapsed .nav-brand-text { opacity: 1; width: auto; }
+    nav.collapsed .nav-link .label { opacity: 1; width: auto; }
+    nav.collapsed .nav-footer { opacity: 1; }
+    .nav-overlay { display: none; position: fixed; inset: 0; background: rgba(58,40,32,0.4); z-index: 49; }
+    .nav-overlay.show { display: block; }
+    .main { margin-left: 0 !important; }
+    .floating-toggle { display: flex !important; }
+  }
+  .floating-toggle {
+    display: none; position: fixed; top: 1rem; left: 1rem; z-index: 100;
+    background: var(--rose); border: none; border-radius: 10px;
+    padding: 0.5rem 0.7rem; font-size: 1.2rem; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(201,123,106,0.35); color: white;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .main { margin-left: var(--nav-w); flex: 1; padding: 2.5rem 2rem; max-width: calc(100vw - var(--nav-w)); transition: margin-left 0.3s ease, max-width 0.3s ease; }
+  .main.expanded { margin-left: var(--nav-collapsed); max-width: calc(100vw - var(--nav-collapsed)); }
+
+  /* ===== PANELS ===== */
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== HOME ===== */
+  .home-hero {
+    background: var(--white); border-radius: 24px;
+    padding: 3rem 2.5rem; margin-bottom: 1.5rem;
+    box-shadow: 0 4px 24px var(--shadow); position: relative; overflow: hidden;
+  }
+  .home-hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--rose), var(--rose-light), var(--sage-light), var(--sage));
+  }
+  .home-hero::after {
+    content: '🧶'; position: absolute; right: 2rem; top: 50%; transform: translateY(-50%);
+    font-size: 6rem; opacity: 0.12; pointer-events: none;
+  }
+  .home-hero h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--brown); margin-bottom: 0.5rem; }
+  .home-hero h1 em { color: var(--rose); font-style: italic; }
+  .home-hero p { color: var(--text-light); font-size: 1rem; line-height: 1.7; max-width: 520px; margin-bottom: 1.5rem; }
+  .home-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .home-tag { padding: 0.35rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 500; }
+  .home-tag.rose { background: rgba(201,123,106,0.12); color: var(--rose-dark); }
+  .home-tag.sage { background: rgba(122,158,138,0.12); color: var(--sage); }
+  .home-tag.brown { background: var(--warm); color: var(--brown); }
+
+  .home-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  @media (max-width: 600px) { .home-cards { grid-template-columns: 1fr; } }
+  .home-card {
+    background: var(--white); border-radius: 18px; padding: 1.5rem;
+    box-shadow: 0 4px 16px var(--shadow); cursor: pointer;
+    border: 2px solid transparent; transition: all 0.2s;
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .home-card:hover { border-color: var(--rose-light); transform: translateY(-3px); box-shadow: 0 8px 24px var(--shadow); }
+  .home-card .card-icon { font-size: 2rem; flex-shrink: 0; }
+  .home-card h3 { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--brown); margin-bottom: 0.3rem; }
+  .home-card p { font-size: 0.82rem; color: var(--text-light); line-height: 1.5; }
+
+  /* ===== SHARED CARD ===== */
+  .card { background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: 0 4px 24px var(--shadow); margin-bottom: 1.5rem; }
+  .card h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--brown); margin-bottom: 0.3rem; }
+  .card .subtitle { color: var(--text-light); font-size: 0.88rem; margin-bottom: 1.5rem; }
+  .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--brown); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
+
+  /* ===== FORM ===== */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 600px) { .form-grid, .form-grid.three { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+  label { font-size: 0.82rem; font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
+  input, select, textarea {
+    padding: 0.7rem 1rem; border: 2px solid var(--warm); border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--text);
+    background: var(--cream); transition: border-color 0.2s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--rose-light); background: var(--white); }
+  textarea { resize: vertical; line-height: 1.6; }
+
+  /* ===== BUTTONS ===== */
+  .btn { padding: 0.75rem 1.8rem; border: none; border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+  .btn-primary { background: var(--rose); color: var(--white); box-shadow: 0 4px 16px rgba(201,123,106,0.35); }
+  .btn-primary:hover { background: var(--rose-dark); transform: translateY(-2px); }
+  .btn-secondary { background: var(--warm); color: var(--brown); }
+  .btn-secondary:hover { background: var(--sage-light); color: var(--white); }
+  .btn-sage { background: var(--sage); color: var(--white); box-shadow: 0 4px 16px rgba(122,158,138,0.35); }
+  .btn-sage:hover { background: #5A8A72; transform: translateY(-2px); }
+
+  /* ===== RESULT ===== */
+  .result { margin-top: 1.2rem; padding: 1.2rem 1.5rem; background: linear-gradient(135deg, var(--warm), #EDE0D0); border-radius: 14px; border-left: 4px solid var(--rose); display: none; }
+  .result.show { display: block; animation: fadeIn 0.3s ease; }
+  .result .result-number { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rose-dark); font-weight: 700; }
+  .result .result-label { color: var(--text-light); font-size: 0.88rem; margin-top: 0.2rem; }
+
+  /* ===== NEEDLE TABLE ===== */
+  .needle-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .needle-table th { background: var(--warm); padding: 0.7rem 1rem; text-align: left; font-weight: 500; color: var(--brown); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .needle-table th:first-child { border-radius: 10px 0 0 10px; }
+  .needle-table th:last-child { border-radius: 0 10px 10px 0; }
+  .needle-table td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--warm); }
+  .needle-table tr:hover td { background: var(--cream); }
+  .needle-table tr:last-child td { border-bottom: none; }
+
+  /* ===== PROJECTS ===== */
+  .project-list { display: flex; flex-direction: column; gap: 0.8rem; }
+  .project-item { padding: 1rem 1.2rem; background: var(--cream); border-radius: 14px; border: 2px solid var(--warm); transition: all 0.2s; cursor: pointer; }
+  .project-item:hover { border-color: var(--rose-light); box-shadow: 0 4px 12px var(--shadow); }
+  .project-item.done { border-color: var(--sage-light); background: rgba(122,158,138,0.07); }
+  .project-item-header { display: flex; align-items: center; gap: 0.8rem; }
+  .project-name { font-weight: 500; color: var(--text); font-size: 0.95rem; flex: 1; }
+  .project-type { font-size: 0.8rem; color: var(--text-light); }
+  .project-badge { padding: 0.25rem 0.7rem; border-radius: 50px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
+  .badge-em-andamento { background: rgba(201,123,106,0.15); color: var(--rose-dark); }
+  .badge-planejado { background: rgba(122,158,138,0.15); color: var(--sage); }
+  .badge-concluido { background: rgba(122,158,138,0.25); color: #3A7A5A; }
+  .color-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.6rem; background: var(--warm); border-radius: 50px; font-size: 0.8rem; color: var(--brown); }
+  .color-tag button { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 0.75rem; line-height: 1; padding: 0; }
+  .empty-state { text-align: center; padding: 2rem; color: var(--text-light); }
+  .empty-state .emoji { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+
+  /* ===== SIZE BTNS ===== */
+  .size-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1.2rem; }
+  @media (max-width: 600px) { .size-grid { grid-template-columns: repeat(3, 1fr); } }
+  .size-btn { padding: 0.6rem; border: 2px solid var(--warm); border-radius: 10px; background: var(--cream); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; color: var(--text-light); transition: all 0.2s; text-align: center; }
+  .size-btn:hover, .size-btn.active { border-color: var(--rose); background: var(--rose); color: var(--white); }
+  .conversion-result { background: var(--cream); border-radius: 14px; padding: 1.2rem; border: 2px solid var(--warm); }
+  .conversion-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--warm); font-size: 0.9rem; }
+  .conversion-row:last-child { border-bottom: none; }
+  .conversion-row .from { color: var(--text-light); }
+  .conversion-row .arrow { color: var(--rose-light); }
+  .conversion-row .to { font-weight: 500; color: var(--brown); }
+
+  /* ===== TIP ===== */
+  .tip { background: linear-gradient(135deg, rgba(122,158,138,0.12), rgba(168,196,180,0.12)); border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--text-light); border-left: 3px solid var(--sage-light); margin-top: 1rem; }
+  .tip strong { color: var(--sage); }
+
+  /* ===== PHOTO THUMBNAIL ===== */
+  .proj-thumb { width: 52px; height: 52px; object-fit: cover; border-radius: 10px; border: 2px solid var(--warm); cursor: pointer; flex-shrink: 0; transition: transform 0.2s; }
+  .proj-thumb:hover { transform: scale(1.08); border-color: var(--rose-light); }
+  .photo-modal-img { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 14px; display: block; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(58,40,32,0.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+  .modal-box { background: var(--white); border-radius: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; box-shadow: 0 12px 48px rgba(58,40,32,0.25); }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--warm); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1rem; color: var(--brown); }
+  .detail-row { padding: 0.7rem 0; border-bottom: 1px solid var(--warm); display: flex; flex-direction: column; gap: 0.3rem; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { font-size: 0.75rem; font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
+  .detail-value { font-size: 0.95rem; color: var(--text); }
+  .detail-receita { white-space: pre-wrap; font-size: 0.88rem; line-height: 1.7; color: var(--text); background: var(--cream); padding: 1rem; border-radius: 10px; border: 1px solid var(--warm); }
+</style>
+</head>
+<body>
+
+<button class="floating-toggle" onclick="toggleNavMobile()">☰</button>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleNavMobile()"></div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-top">
+    <div class="nav-brand">
+      <span class="yarn">🧶</span>
+      <div class="nav-brand-text">
+        <h2>Studio de Crochê</h2>
+        <span>by Isabella</span>
+      </div>
+    </div>
+    <button class="nav-toggle" onclick="toggleNavCollapse()" title="Recolher menu">☰</button>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="switchTab('home',this)"><span class="icon">🏠</span><span class="label"> Home</span></button>
+    <button class="nav-link" onclick="switchTab('projetos',this)"><span class="icon">📋</span><span class="label"> Meus Projetos</span></button>
+    <button class="nav-link" onclick="switchTab('estoque',this)"><span class="icon">📦</span><span class="label"> Meu Estoque</span></button>
+    <button class="nav-link" onclick="switchTab('glossario',this)"><span class="icon">📖</span><span class="label"> Glossário</span></button>
+    <button class="nav-link" onclick="switchTab('agulhas',this)"><span class="icon">🪡</span><span class="label"> Agulhas</span></button>
+    <button class="nav-link" onclick="switchTab('contador',this)"><span class="icon">⏱️</span><span class="label"> Contador</span></button>
+    <button class="nav-link" onclick="switchTab('paleta',this)"><span class="icon">🎨</span><span class="label"> Paleta de Cores</span></button>
+    <button class="nav-link" onclick="switchTab('la',this)"><span class="icon">🧵</span><span class="label"> Calcular Lã</span></button>
+    <button class="nav-link" onclick="switchTab('pontos',this)"><span class="icon">📐</span><span class="label"> Calcular Pontos</span></button>
+    <button class="nav-link" onclick="switchTab('tamanhos',this)"><span class="icon">📏</span><span class="label"> Converter Tamanhos</span></button>
+  </div>
+  <div class="nav-footer" style="cursor:pointer;" onclick="switchTabById('contato')">📩 Fale comigo</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HOME -->
+  <div id="tab-home" class="panel active">
+    <div class="home-hero">
+      <h1>Oi, eu sou a <em>Isabella!</em> 👋</h1>
+      <p>
+        Sou crocheteira e estudante de Matemática Computacional.
+        Combinei um ao outro e o <strong>Studio de Crochê</strong> surgiu.
+        Decidi criar o <strong>Studio de Crochê</strong> porque eu queria
+        um lugar para organizar meus projetos, guardar receitas, calcular 
+        quantos novelos comprar e nunca mais errar os tamanhos. Se você crocheta, 
+        espero que seja útil pra você também! 🌸
+      </p>
+      <div class="home-tags">
+        <span class="home-tag rose">🧶 Crochê</span>
+        <span class="home-tag sage">📐 Matemática Computacional - UFF</span>
+        <span class="home-tag brown">🌊 Rio das Ostras, RJ</span>
+      </div>
+    </div>
+
+    <div class="home-cards">
+      <div class="home-card" onclick="switchTabById('projetos')">
+        <span class="card-icon">📋</span>
+        <div>
+          <h3>Meus Projetos</h3>
+          <p>Registre seus projetos, guarde receitas, cores e acompanhe o progresso de cada um.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('estoque')">
+        <span class="card-icon">📦</span>
+        <div>
+          <h3>Meu Estoque</h3>
+          <p>Registre os novelos que você já tem em casa para nunca comprar repetido.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('glossario')">
+        <span class="card-icon">📖</span>
+        <div>
+          <h3>Glossário de Pontos</h3>
+          <p>Referência completa dos pontos de crochê com abreviações, descrições e dicas.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('agulhas')">
+        <span class="card-icon">🪡</span>
+        <div>
+          <h3>Tabela de Agulhas</h3>
+          <p>Conversão completa entre milímetros, numeração US e UK com fio indicado.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('contador')">
+        <span class="card-icon">⏱️</span>
+        <div>
+          <h3>Contador de Fileiras</h3>
+          <p>Clique para contar fileiras enquanto crocheta. Com alarme e histórico de sessão.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('paleta')">
+        <span class="card-icon">🎨</span>
+        <div>
+          <h3>Paleta de Cores</h3>
+          <p>Monte combinações de cores para seus projetos e salve suas paletas favoritas.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('la')">
+        <span class="card-icon">🧵</span>
+        <div>
+          <h3>Calcular Lã</h3>
+          <p>Descubra quantos novelos você precisa baseado no tamanho do projeto e tipo de ponto.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('pontos')">
+        <span class="card-icon">📐</span>
+        <div>
+          <h3>Calcular Pontos</h3>
+          <p>Use sua amostra (gauge) para calcular exatamente quantos pontos montar.</p>
+        </div>
+      </div>
+      <div class="home-card" onclick="switchTabById('tamanhos')">
+        <span class="card-icon">📏</span>
+        <div>
+          <h3>Converter Tamanhos</h3>
+          <p>Redimensione receitas de PP a XGG com o fator de conversão automático.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJETOS -->
+  <div id="tab-projetos" class="panel">
+    <div class="page-title">📋 Meus Projetos</div>
+    <div class="card">
+      <h2>Adicionar Projeto</h2>
+      <p class="subtitle">Registre seu projeto e acompanhe o progresso</p>
+      <div class="form-grid">
+        <div class="field"><label>Nome do projeto</label><input type="text" id="proj-nome" placeholder="Ex: Blusinha"></div>
+        <div class="field"><label>Tipo</label>
+          <select id="proj-tipo">
+            <option>Roupa</option><option>Acessório</option><option>Amigurumi</option>
+            <option>Casa / Decoração</option><option>Brinquedo</option><option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Novelos necessários</label><input type="number" id="proj-novelos" placeholder="Ex: 4" min="1" step="0.5"></div>
+        <div class="field"><label>Status</label>
+          <select id="proj-status">
+            <option value="planejado">Planejado</option>
+            <option value="em-andamento">Em andamento</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:1.2rem;">
+        <label>Cores do fio</label>
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+          <input type="text" id="proj-cor-input" placeholder="Ex: Laranja — adicione uma por vez" style="flex:1;">
+          <button class="btn btn-secondary" style="padding:0.7rem 1rem;border-radius:12px;white-space:nowrap;" onclick="adicionarCor()">+ Cor</button>
+        </div>
+        <div id="proj-cores-tags" style="display:flex;flex-wrap:wrap;gap:0.4rem;min-height:28px;"></div>
+      </div>
+      <div class="field" style="margin-bottom:1.2rem;"><label>Notas (opcional)</label><input type="text" id="proj-notas" placeholder="Ex: Agulha 4mm, tamanho M"></div>
+      <div class="field" style="margin-bottom:1.2rem;">
+        <label>Foto do projeto (opcional)</label>
+        <div id="proj-foto-area" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <label for="proj-foto-input" style="text-transform:none;font-size:0.9rem;cursor:pointer;background:var(--warm);padding:0.6rem 1.2rem;border-radius:50px;color:var(--brown);font-weight:500;transition:background 0.2s;display:inline-block;" onmouseover="this.style.background='var(--sage-light)';this.style.color='white'" onmouseout="this.style.background='var(--warm)';this.style.color='var(--brown)'">📷 Escolher foto</label>
+          <input type="file" id="proj-foto-input" accept="image/*" style="display:none;" onchange="previewFoto(this)">
+          <div id="proj-foto-preview" style="display:none;position:relative;">
+            <img id="proj-foto-img" style="width:70px;height:70px;object-fit:cover;border-radius:12px;border:2px solid var(--warm);cursor:pointer;" onclick="ampliarFotoPreview()" title="Clique para ampliar">
+            <button onclick="removerFoto()" style="position:absolute;top:-6px;right:-6px;background:var(--rose);border:none;border-radius:50%;width:20px;height:20px;font-size:0.7rem;cursor:pointer;color:white;line-height:20px;text-align:center;">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:1.5rem;">
+        <label>Receita (opcional)</label>
+        <textarea id="proj-receita" placeholder="Cole ou escreva a receita do projeto aqui..." rows="6"></textarea>
+      </div>
+      <button class="btn btn-sage" onclick="adicionarProjeto()">+ Adicionar Projeto</button>
+    </div>
+    <div class="card">
+      <h2>Meus Projetos</h2>
+      <p class="subtitle" id="proj-count">Nenhum projeto ainda</p>
+      <div id="project-list" class="project-list"></div>
+    </div>
+  </div>
+
+  <!-- CALCULAR LÃ -->
+  <div id="tab-la" class="panel">
+    <div class="page-title">🧵 Calcular Lã</div>
+    <div class="card">
+      <h2>Calculadora de Lã</h2>
+      <p class="subtitle">Descubra quantos novelos você precisa para o seu projeto</p>
+      <div class="form-grid">
+        <div class="field"><label>Largura do projeto (cm)</label><input type="number" id="la-largura" placeholder="Ex: 50" min="1"></div>
+        <div class="field"><label>Comprimento do projeto (cm)</label><input type="number" id="la-comprimento" placeholder="Ex: 60" min="1"></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Metragem do novelo (m)</label><input type="number" id="la-metragem" placeholder="Ex: 200" min="1"></div>
+        <div class="field"><label>Tipo de ponto</label>
+          <select id="la-ponto">
+            <option value="1.0">Ponto baixo</option><option value="1.4">Ponto alto</option>
+            <option value="0.8">Ponto caranguejo</option><option value="1.6">Ponto fantasia</option>
+            <option value="1.2">Ponto meia coluna</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Espessura do fio</label>
+          <select id="la-espessura">
+            <option value="0.8">Fino (linha)</option><option value="1.0" selected>Médio (amigurumi)</option>
+            <option value="1.3">Grosso (bulky)</option><option value="1.6">Extra grosso</option>
+          </select>
+        </div>
+        <div class="field"><label>Amostras por 10cm (pontos)</label><input type="number" id="la-gauge" placeholder="Ex: 14" min="1"></div>
+      </div>
+      <button class="btn btn-primary" onclick="calcularLa()">Calcular Novelos</button>
+      <div id="la-result" class="result">
+        <div class="result-number" id="la-numero"></div>
+        <div class="result-label" id="la-detalhe"></div>
+      </div>
+      <div class="tip"><strong>💡 Dica:</strong> Sempre compre 1–2 novelos a mais para garantir que o lote de cor seja o mesmo!</div>
+    </div>
+  </div>
+
+  <!-- CALCULAR PONTOS -->
+  <div id="tab-pontos" class="panel">
+    <div class="page-title">📐 Calcular Pontos</div>
+    <div class="card">
+      <h2>Calculadora de Pontos</h2>
+      <p class="subtitle">Baseado na sua amostra (gauge), calcule os pontos para o tamanho desejado</p>
+      <div class="form-grid">
+        <div class="field"><label>Pontos na amostra</label><input type="number" id="pt-pontos-amostra" placeholder="Ex: 14" min="1"></div>
+        <div class="field"><label>Largura da amostra (cm)</label><input type="number" id="pt-cm-amostra" placeholder="Ex: 10" min="1"></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Largura desejada (cm)</label><input type="number" id="pt-largura" placeholder="Ex: 50" min="1"></div>
+        <div class="field"><label>Comprimento desejado (cm)</label><input type="number" id="pt-comprimento" placeholder="Ex: 60" min="1"></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Fileiras na amostra</label><input type="number" id="pt-fileiras-amostra" placeholder="Ex: 16" min="1"></div>
+        <div class="field"><label>Altura da amostra (cm)</label><input type="number" id="pt-cm-fileiras" placeholder="Ex: 10" min="1"></div>
+      </div>
+      <button class="btn btn-primary" onclick="calcularPontos()">Calcular</button>
+      <div id="pt-result" class="result">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div><div class="result-number" id="pt-pontos"></div><div class="result-label">pontos para montar</div></div>
+          <div><div class="result-number" id="pt-fileiras"></div><div class="result-label">fileiras no total</div></div>
+        </div>
+      </div>
+      <div class="tip"><strong>💡 Dica:</strong> Faça uma amostra de 15×15cm e lave antes de medir para um gauge mais preciso!</div>
+    </div>
+  </div>
+
+  <!-- CONVERTER TAMANHOS -->
+  <div id="tab-tamanhos" class="panel">
+    <div class="page-title">📏 Converter Tamanhos</div>
+    <div class="card">
+      <h2>Conversor de Tamanhos</h2>
+      <p class="subtitle">Redimensione sua receita de um tamanho para outro</p>
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;margin-bottom:0.5rem;">Tamanho da receita original</label>
+        <div class="size-grid" id="from-sizes">
+          <button class="size-btn active" onclick="selectSize('from','PP',this)">PP</button>
+          <button class="size-btn" onclick="selectSize('from','P',this)">P</button>
+          <button class="size-btn" onclick="selectSize('from','M',this)">M</button>
+          <button class="size-btn" onclick="selectSize('from','G',this)">G</button>
+          <button class="size-btn" onclick="selectSize('from','GG',this)">GG</button>
+          <button class="size-btn" onclick="selectSize('from','XGG',this)">XGG</button>
+        </div>
+      </div>
+      <div style="margin-bottom:1.2rem;">
+        <label style="display:block;margin-bottom:0.5rem;">Tamanho desejado</label>
+        <div class="size-grid" id="to-sizes">
+          <button class="size-btn" onclick="selectSize('to','PP',this)">PP</button>
+          <button class="size-btn" onclick="selectSize('to','P',this)">P</button>
+          <button class="size-btn active" onclick="selectSize('to','M',this)">M</button>
+          <button class="size-btn" onclick="selectSize('to','G',this)">G</button>
+          <button class="size-btn" onclick="selectSize('to','GG',this)">GG</button>
+          <button class="size-btn" onclick="selectSize('to','XGG',this)">XGG</button>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Pontos da receita original</label><input type="number" id="sz-pontos" placeholder="Ex: 80" min="1"></div>
+        <div class="field"><label>Novelos da receita original</label><input type="number" id="sz-novelos" placeholder="Ex: 3" min="1" step="0.5"></div>
+      </div>
+      <button class="btn btn-primary" onclick="converterTamanho()">Converter</button>
+      <div id="sz-result" class="result"><div id="sz-content"></div></div>
+      <div class="tip"><strong>💡 Referência:</strong> PP (76cm) · P (80cm) · M (88cm) · G (96cm) · GG (104cm) · XGG (112cm)</div>
+    </div>
+  </div>
+
+  <!-- AGULHAS -->
+  <div id="tab-agulhas" class="panel">
+    <div class="page-title">🪡 Tabela de Agulhas</div>
+    <div class="card">
+      <h2>Conversão de Agulhas</h2>
+      <p class="subtitle">Milímetros, numeração US e UK com fio indicado</p>
+      <div class="field" style="margin-bottom:1.2rem;"><label>Buscar</label><input type="text" id="needle-search" placeholder="Ex: 4.0 ou tamanho 6..." oninput="filterNeedles()"></div>
+      <div style="overflow-x:auto;">
+        <table class="needle-table">
+          <thead><tr><th>mm</th><th>US</th><th>UK</th><th>Fio indicado</th><th>Uso comum</th></tr></thead>
+          <tbody id="needle-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- CONTADOR DE FILEIRAS -->
+  <div id="tab-contador" class="panel">
+    <div class="page-title">⏱️ Contador de Fileiras</div>
+    <div class="card" style="text-align:center;">
+      <h2>Contador</h2>
+      <p class="subtitle">Clique no botão para contar fileiras enquanto crocheta</p>
+      <div style="margin:1.5rem 0;">
+        <div id="cnt-numero" style="font-family:'Playfair Display',serif;font-size:5rem;color:var(--rose-dark);font-weight:700;line-height:1;margin-bottom:0.3rem;">0</div>
+        <div style="font-size:0.88rem;color:var(--text-light);">fileiras</div>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;">
+        <button class="btn btn-primary" onclick="cntAdd()" style="font-size:1.1rem;padding:1rem 2.5rem;">＋ Fileira</button>
+        <button class="btn btn-secondary" onclick="cntUndo()">↩ Desfazer</button>
+        <button class="btn btn-secondary" onclick="cntReset()">✕ Zerar</button>
+      </div>
+      <div style="display:flex;gap:1rem;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
+        <label style="font-size:0.85rem;text-transform:none;color:var(--text-light);">🔔 Alarme a cada</label>
+        <input type="number" id="cnt-alarme" value="10" min="1" max="999" style="width:70px;text-align:center;">
+        <label style="font-size:0.85rem;text-transform:none;color:var(--text-light);">fileiras</label>
+      </div>
+      <div id="cnt-aviso" style="display:none;background:rgba(201,123,106,0.12);border-radius:12px;padding:0.8rem 1rem;color:var(--rose-dark);font-weight:500;margin-top:0.5rem;"></div>
+    </div>
+    <div class="card">
+      <h2>Sessões salvas</h2>
+      <p class="subtitle">Histórico dos seus contadores</p>
+      <div style="display:flex;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <input type="text" id="cnt-nome" placeholder="Nome da sessão (ex: manga esquerda)" style="flex:1;">
+        <button class="btn btn-sage" onclick="cntSalvar()" style="white-space:nowrap;">💾 Salvar</button>
+      </div>
+      <div id="cnt-historico"></div>
+    </div>
+  </div>
+
+  <!-- MEU ESTOQUE -->
+  <div id="tab-estoque" class="panel">
+    <div class="page-title">📦 Meu Estoque</div>
+    <div class="card">
+      <h2>Adicionar Novelo</h2>
+      <p class="subtitle">Registre os fios que você já tem em casa</p>
+      <div class="form-grid">
+        <div class="field"><label>Marca / Nome do fio</label><input type="text" id="est-nome" placeholder="Ex: Pingouin Confort"></div>
+        <div class="field"><label>Cor</label><input type="text" id="est-cor" placeholder="Ex: Verde musgo"></div>
+      </div>
+      <div class="form-grid three">
+        <div class="field"><label>Quantidade (novelos)</label><input type="number" id="est-qtd" placeholder="Ex: 3" min="1" step="1"></div>
+        <div class="field"><label>Metragem por novelo (m)</label><input type="number" id="est-metro" placeholder="Ex: 200" min="1"></div>
+        <div class="field"><label>Espessura</label>
+          <select id="est-espessura">
+            <option>Linha fina</option><option>Fino</option><option>Médio</option>
+            <option>Grosso</option><option>Bulky</option><option>Super Bulky</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:1.2rem;"><label>Notas (opcional)</label><input type="text" id="est-notas" placeholder="Ex: Comprei em São Paulo, tom quente"></div>
+      <button class="btn btn-sage" onclick="estAdicionar()">+ Adicionar ao Estoque</button>
+    </div>
+    <div class="card">
+      <h2>Meu Estoque</h2>
+      <p class="subtitle" id="est-count">Nenhum item ainda</p>
+      <div style="margin-bottom:1rem;"><input type="text" id="est-busca" placeholder="🔍 Buscar por cor, marca..." oninput="estRender()" style="width:100%;"></div>
+      <div id="est-lista"></div>
+    </div>
+  </div>
+
+  <!-- PALETA DE CORES -->
+  <div id="tab-paleta" class="panel">
+    <div class="page-title">🎨 Paleta de Cores</div>
+    <div class="card">
+      <h2>Montar Paleta</h2>
+      <p class="subtitle">Escolha cores e salve combinações para seus projetos</p>
+      <div style="display:flex;gap:0.8rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <div class="field" style="flex:1;min-width:180px;">
+          <label>Nome da cor</label>
+          <input type="text" id="pal-nome-cor" placeholder="Ex: Rosa antigo">
+        </div>
+        <div class="field">
+          <label>Cor</label>
+          <input type="color" id="pal-cor-picker" value="#C97B6A" style="width:60px;height:44px;padding:2px;border-radius:10px;cursor:pointer;">
+        </div>
+        <button class="btn btn-primary" onclick="palAddCor()" style="margin-bottom:2px;">+ Adicionar</button>
+      </div>
+      <div id="pal-cores-atuais" style="display:flex;flex-wrap:wrap;gap:0.6rem;min-height:44px;margin-bottom:1.2rem;padding:0.8rem;background:var(--cream);border-radius:12px;border:2px solid var(--warm);"></div>
+      <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+        <input type="text" id="pal-nome" placeholder="Nome da paleta (ex: Jardim de inverno)" style="flex:1;">
+        <button class="btn btn-sage" onclick="palSalvar()">💾 Salvar Paleta</button>
+        <button class="btn btn-secondary" onclick="palLimpar()">✕ Limpar</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Paletas Salvas</h2>
+      <p class="subtitle" id="pal-count">Nenhuma paleta ainda</p>
+      <div id="pal-lista"></div>
+    </div>
+  </div>
+
+  <!-- GLOSSÁRIO -->
+  <div id="tab-glossario" class="panel">
+    <div class="page-title">📖 Glossário de Pontos</div>
+    <div class="card">
+      <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1.2rem;">
+        <div class="field" style="flex:1;margin:0;">
+          <label>Buscar ponto</label>
+          <input type="text" id="glos-busca" placeholder="Ex: ponto baixo, pb, aumento..." oninput="glosRender()">
+        </div>
+        <button class="btn btn-sage" onclick="glosToggleForm()" style="margin-top:1.4rem;white-space:nowrap;">+ Novo ponto</button>
+      </div>
+
+      <div id="glos-form" style="display:none;background:var(--cream);border-radius:16px;padding:1.2rem;border:2px solid var(--sage-light);margin-bottom:1.2rem;">
+        <div style="font-weight:600;color:var(--brown);margin-bottom:1rem;font-family:'Playfair Display',serif;">Adicionar ponto personalizado</div>
+        <div class="form-grid" style="margin-bottom:1rem;">
+          <div class="field"><label>Abreviação</label><input type="text" id="glos-add-abrev" placeholder="Ex: PBX"></div>
+          <div class="field"><label>Nome do ponto</label><input type="text" id="glos-add-nome" placeholder="Ex: Ponto Baixíssimo"></div>
+        </div>
+        <div class="field" style="margin-bottom:1rem;">
+          <label>Como é feito</label>
+          <textarea id="glos-add-desc" rows="3" placeholder="Descreva como executar o ponto..."></textarea>
+        </div>
+        <div style="display:flex;gap:0.8rem;">
+          <button class="btn btn-sage" onclick="glosAdicionar()">💾 Salvar</button>
+          <button class="btn btn-secondary" onclick="glosToggleForm()">Cancelar</button>
+        </div>
+      </div>
+
+      <div id="glos-lista"></div>
+    </div>
+  </div>
+
+
+  <!-- CONTATO -->
+  <div id="tab-contato" class="panel">
+    <div class="page-title">📩 Fale Comigo</div>
+    <div class="card" style="max-width:520px;">
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:1rem 0 1.5rem;">
+        <div style="font-size:4rem;margin-bottom:1rem;">🧶</div>
+        <h2 style="margin-bottom:0.4rem;">Isabella Macedo Gustafson</h2>
+        <p style="color:var(--text-light);font-size:0.9rem;margin-bottom:1.5rem;"> Desenvolvedora e idealizadora do projeto</p>
+        <div style="width:100%;display:flex;flex-direction:column;gap:0.8rem;">
+          <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:var(--cream);border-radius:14px;border:2px solid var(--warm);">
+            <span style="font-size:1.4rem;">✉️</span>
+            <div style="text-align:left;">
+              <div style="font-size:0.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.05em;font-weight:500;">E-mail</div>
+              <div style="font-weight:500;">isabella.macedo.gustafson@gmail.com</div>
+            </div>
+          </div>
+          <a href="https://www.linkedin.com/in/isabella-macedo-gustafson" target="_blank" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:var(--cream);border-radius:14px;border:2px solid var(--warm);text-decoration:none;color:var(--text);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--rose-light)'" onmouseout="this.style.borderColor='var(--warm)'">
+            <span style="font-size:1.4rem;">💼</span>
+            <div style="text-align:left;">
+              <div style="font-size:0.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.05em;font-weight:500;">LinkedIn</div>
+              <div style="font-weight:500;">isabella-macedo-gustafson</div>
+            </div>
+          </a>
+          <a href="https://github.com/imgustafson" target="_blank" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:var(--cream);border-radius:14px;border:2px solid var(--warm);text-decoration:none;color:var(--text);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--rose-light)'" onmouseout="this.style.borderColor='var(--warm)'">
+            <span style="font-size:1.4rem;">🐙</span>
+            <div style="text-align:left;">
+              <div style="font-size:0.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.05em;font-weight:500;">GitHub</div>
+              <div style="font-weight:500;">github.com/imgustafson</div>
+            </div>
+          </a>
+          <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:var(--cream);border-radius:14px;border:2px solid var(--warm);">
+            <span style="font-size:1.4rem;">🌊</span>
+            <div style="text-align:left;">
+              <div style="font-size:0.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.05em;font-weight:500;">Localização</div>
+              <div style="font-weight:500;">Rio das Ostras, Rio de Janeiro</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<!-- MODAL -->
+<div id="modal-overlay" class="modal-overlay" onclick="fecharModalFora(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="fecharModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ===== NAV =====
+function switchTab(tab, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('nav-overlay').classList.remove('show'); }
+}
+function switchTabById(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => { if (l.onclick && l.onclick.toString().includes("'" + tab + "'")) l.classList.add('active'); });
+}
+function toggleNavCollapse() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.querySelector('.main');
+  sidebar.classList.toggle('collapsed');
+  main.classList.toggle('expanded');
+}
+function toggleNavMobile() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('nav-overlay').classList.toggle('show');
+}
+
+// ===== CALCULADORA DE LÃ =====
+function calcularLa() {
+  const largura = parseFloat(document.getElementById('la-largura').value);
+  const comprimento = parseFloat(document.getElementById('la-comprimento').value);
+  const metragem = parseFloat(document.getElementById('la-metragem').value);
+  const gauge = parseFloat(document.getElementById('la-gauge').value) || 14;
+  const ponto = parseFloat(document.getElementById('la-ponto').value);
+  const espessura = parseFloat(document.getElementById('la-espessura').value);
+  if (!largura || !comprimento || !metragem) { alert('Preencha largura, comprimento e metragem!'); return; }
+  const area = largura * comprimento;
+  const metrosTotais = (area / 100) * (gauge / 10) * ponto * espessura * 0.8 * 10;
+  const novelos = Math.ceil(metrosTotais / metragem);
+  document.getElementById('la-numero').textContent = (novelos + 1) + ' novelos';
+  document.getElementById('la-detalhe').textContent = `~${Math.round(metrosTotais)}m necessários · ${novelos} + 1 extra de segurança`;
+  document.getElementById('la-result').classList.add('show');
+}
+
+// ===== CALCULADORA DE PONTOS =====
+function calcularPontos() {
+  const pA = parseFloat(document.getElementById('pt-pontos-amostra').value);
+  const cA = parseFloat(document.getElementById('pt-cm-amostra').value);
+  const larg = parseFloat(document.getElementById('pt-largura').value);
+  const comp = parseFloat(document.getElementById('pt-comprimento').value);
+  const fA = parseFloat(document.getElementById('pt-fileiras-amostra').value);
+  const cF = parseFloat(document.getElementById('pt-cm-fileiras').value);
+  if (!pA || !cA || !larg) { alert('Preencha os dados da amostra e a largura!'); return; }
+  document.getElementById('pt-pontos').textContent = Math.round(larg * (pA / cA));
+  document.getElementById('pt-fileiras').textContent = (comp && fA && cF) ? Math.round(comp * (fA / cF)) : '—';
+  document.getElementById('pt-result').classList.add('show');
+}
+
+// ===== CONVERSOR DE TAMANHOS =====
+const sizeFactors = { 'PP': 0.85, 'P': 0.92, 'M': 1.0, 'G': 1.10, 'GG': 1.20, 'XGG': 1.32 };
+let fromSize = 'PP', toSize = 'M';
+function selectSize(type, size, btn) {
+  if (type === 'from') { fromSize = size; document.querySelectorAll('#from-sizes .size-btn').forEach(b => b.classList.remove('active')); }
+  else { toSize = size; document.querySelectorAll('#to-sizes .size-btn').forEach(b => b.classList.remove('active')); }
+  btn.classList.add('active');
+}
+function converterTamanho() {
+  const pontos = parseFloat(document.getElementById('sz-pontos').value);
+  const novelos = parseFloat(document.getElementById('sz-novelos').value);
+  if (!pontos && !novelos) { alert('Preencha pontos ou novelos!'); return; }
+  const fator = sizeFactors[toSize] / sizeFactors[fromSize];
+  let html = `<div style="margin-bottom:0.5rem;font-size:0.85rem;color:var(--text-light)">Fator ${fromSize} → ${toSize}: <strong>${fator.toFixed(2)}x</strong></div><div class="conversion-result">`;
+  if (pontos) html += `<div class="conversion-row"><span class="from">${pontos} pontos (${fromSize})</span><span class="arrow">→</span><span class="to">${Math.round(pontos*fator)} pontos (${toSize})</span></div>`;
+  if (novelos) html += `<div class="conversion-row"><span class="from">${novelos} novelos (${fromSize})</span><span class="arrow">→</span><span class="to">${(novelos*fator*fator).toFixed(1)} novelos (${toSize})</span></div>`;
+  html += '</div>';
+  document.getElementById('sz-content').innerHTML = html;
+  document.getElementById('sz-result').classList.add('show');
+}
+
+// ===== AGULHAS =====
+const needles = [
+  { mm:'2.0',us:'B-1',uk:'14',fio:'Linha fina',uso:'Renda, bijuteria'},
+  { mm:'2.5',us:'C-2',uk:'12',fio:'Linha',uso:'Renda, toalha'},
+  { mm:'3.0',us:'D-3',uk:'11',fio:'Fino',uso:'Amigurumi pequeno'},
+  { mm:'3.5',us:'E-4',uk:'9',fio:'Fino/Médio',uso:'Amigurumi, brinquedo'},
+  { mm:'4.0',us:'G-6',uk:'8',fio:'Médio (DK)',uso:'Amigurumi, roupa leve'},
+  { mm:'4.5',us:'7',uk:'7',fio:'Médio',uso:'Roupa, acessório'},
+  { mm:'5.0',us:'H-8',uk:'6',fio:'Médio/Grosso',uso:'Blusa, cachecol'},
+  { mm:'5.5',us:'I-9',uk:'5',fio:'Grosso (Worsted)',uso:'Blusa, bolsa'},
+  { mm:'6.0',us:'J-10',uk:'4',fio:'Grosso',uso:'Bolsa, tapete'},
+  { mm:'6.5',us:'K-10.5',uk:'3',fio:'Grosso/Bulky',uso:'Tapete, manta'},
+  { mm:'7.0',us:'K-10.5',uk:'2',fio:'Bulky',uso:'Manta, tapete grosso'},
+  { mm:'8.0',us:'L-11',uk:'0',fio:'Super Bulky',uso:'Manta, decoração'},
+  { mm:'9.0',us:'M-13',uk:'00',fio:'Super Bulky',uso:'Manta rápida'},
+  { mm:'10.0',us:'N-15',uk:'000',fio:'Jumbo',uso:'Manta jumbo, tapete'},
+  { mm:'12.0',us:'P-16',uk:'—',fio:'Jumbo',uso:'Manta chunky'},
+  { mm:'15.0',us:'Q',uk:'—',fio:'Super Jumbo',uso:'Finger knitting'},
+];
+function renderNeedles(data) {
+  document.getElementById('needle-body').innerHTML = data.map(n =>
+    `<tr><td><strong>${n.mm}mm</strong></td><td>${n.us}</td><td>${n.uk}</td><td>${n.fio}</td><td style="color:var(--text-light);font-size:0.85rem">${n.uso}</td></tr>`
+  ).join('');
+}
+function filterNeedles() {
+  const q = document.getElementById('needle-search').value.toLowerCase();
+  renderNeedles(needles.filter(n => n.mm.includes(q)||n.us.toLowerCase().includes(q)||n.uk.includes(q)||n.fio.toLowerCase().includes(q)||n.uso.toLowerCase().includes(q)));
+}
+renderNeedles(needles);
+
+// ===== PROJETOS =====
+let projects = JSON.parse(localStorage.getItem('crochet-projects') || '[]');
+let coresTemp = [];
+let fotoTemp = null;
+function salvar() { localStorage.setItem('crochet-projects', JSON.stringify(projects)); }
+
+function previewFoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    fotoTemp = e.target.result;
+    document.getElementById('proj-foto-img').src = fotoTemp;
+    document.getElementById('proj-foto-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function removerFoto() {
+  fotoTemp = null;
+  document.getElementById('proj-foto-preview').style.display = 'none';
+  document.getElementById('proj-foto-input').value = '';
+}
+function ampliarFotoPreview() {
+  if (!fotoTemp) return;
+  document.getElementById('modal-content').innerHTML = `<img src="${fotoTemp}" class="photo-modal-img">`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function ampliarFoto(src) {
+  document.getElementById('modal-content').innerHTML = `<img src="${src}" class="photo-modal-img">`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function adicionarCor() {
+  const input = document.getElementById('proj-cor-input');
+  const cor = input.value.trim();
+  if (!cor) return;
+  coresTemp.push(cor); input.value = ''; renderCoresTags();
+}
+document.getElementById('proj-cor-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); adicionarCor(); } });
+function removerCor(i) { coresTemp.splice(i, 1); renderCoresTags(); }
+function renderCoresTags() {
+  document.getElementById('proj-cores-tags').innerHTML = coresTemp.map((c,i) =>
+    `<span class="color-tag">🧵 ${c} <button onclick="removerCor(${i})">✕</button></span>`
+  ).join('');
+}
+
+function adicionarProjeto() {
+  const nome = document.getElementById('proj-nome').value.trim();
+  if (!nome) { alert('Digite o nome do projeto!'); return; }
+  const status = document.getElementById('proj-status').value;
+  projects.unshift({ id: Date.now(), nome, tipo: document.getElementById('proj-tipo').value, cores: [...coresTemp], novelos: document.getElementById('proj-novelos').value, status, notas: document.getElementById('proj-notas').value, receita: document.getElementById('proj-receita').value, foto: fotoTemp || null, done: status === 'concluido' });
+  salvar(); renderProjetos();
+  ['proj-nome','proj-novelos','proj-notas','proj-receita'].forEach(id => document.getElementById(id).value = '');
+  coresTemp = []; fotoTemp = null; renderCoresTags();
+  document.getElementById('proj-foto-preview').style.display = 'none';
+  document.getElementById('proj-foto-input').value = '';
+}
+
+function deletarProjeto(id) {
+  if (!confirm('Remover este projeto?')) return;
+  projects = projects.filter(p => p.id !== id);
+  salvar(); renderProjetos(); fecharModal();
+}
+
+const badgeClass = { 'planejado':'badge-planejado','em-andamento':'badge-em-andamento','concluido':'badge-concluido' };
+const badgeLabel = { 'planejado':'Planejado','em-andamento':'Em andamento','concluido':'Concluído' };
+
+function renderProjetos() {
+  const list = document.getElementById('project-list');
+  const count = document.getElementById('proj-count');
+  if (projects.length === 0) {
+    count.textContent = 'Nenhum projeto ainda';
+    list.innerHTML = `<div class="empty-state"><span class="emoji">🧶</span><p>Adicione seu primeiro projeto acima!</p></div>`;
+    return;
+  }
+  const concluidos = projects.filter(p => p.done).length;
+  count.textContent = `${projects.length} projeto${projects.length>1?'s':''} · ${concluidos} concluído${concluidos!==1?'s':''}`;
+  list.innerHTML = projects.map(p => `
+    <div class="project-item ${p.done?'done':''}" onclick="abrirDetalhes(${p.id})">
+      <div class="project-item-header">
+        ${p.foto ? `<img src="${p.foto}" class="proj-thumb" onclick="event.stopPropagation();ampliarFoto('${p.foto}')" title="Ver foto">` : '<div style="width:52px;height:52px;border-radius:10px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;">🧶</div>'}
+        <div style="flex:1;"><div class="project-name">${p.nome}</div><div class="project-type">${p.tipo}</div></div>
+        <span class="project-badge ${badgeClass[p.status]}">${badgeLabel[p.status]}</span>
+      </div>
+    </div>`).join('');
+}
+
+function abrirDetalhes(id) {
+  const p = projects.find(x => x.id === id);
+  if (!p) return;
+  const cores = p.cores && p.cores.length ? p.cores.map(c => `<span class="color-tag">🧵 ${c}</span>`).join(' ') : '—';
+  document.getElementById('modal-content').innerHTML = `
+    <div style="margin-bottom:1.5rem;padding-right:2rem;display:flex;gap:1rem;align-items:flex-start;">
+      ${p.foto ? `<img src="${p.foto}" style="width:80px;height:80px;object-fit:cover;border-radius:14px;border:2px solid var(--warm);cursor:pointer;flex-shrink:0;" onclick="ampliarFoto('${p.foto}')">` : ''}
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--brown);margin-bottom:0.4rem;">${p.nome}</h2>
+        <span class="project-badge ${badgeClass[p.status]}">${badgeLabel[p.status]}</span>
+      </div>
+    </div>
+    <div class="detail-row"><div class="detail-label">Tipo</div><div class="detail-value">${p.tipo}</div></div>
+    <div class="detail-row"><div class="detail-label">Cores do fio</div><div class="detail-value" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.2rem;">${cores}</div></div>
+    <div class="detail-row"><div class="detail-label">Novelos</div><div class="detail-value">${p.novelos||'—'}</div></div>
+    ${p.notas?`<div class="detail-row"><div class="detail-label">Notas</div><div class="detail-value">${p.notas}</div></div>`:''}
+    ${p.receita?`<div class="detail-row"><div class="detail-label">Receita</div><div class="detail-receita">${p.receita}</div></div>`:''}
+    <div style="display:flex;gap:0.8rem;margin-top:1.5rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="abrirEdicao(${p.id})">✏️ Editar</button>
+      <button class="btn btn-secondary" onclick="deletarProjeto(${p.id})" style="color:var(--rose-dark);">🗑 Remover</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function abrirEdicao(id) {
+  const p = projects.find(x => x.id === id);
+  if (!p) return;
+  const coresHtml = (p.cores||[]).map((c,i)=>`<span class="color-tag">🧵 ${c} <button onclick="removerCorEdit(${i},${id})">✕</button></span>`).join('');
+  document.getElementById('modal-content').innerHTML = `
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--brown);margin-bottom:1.2rem;padding-right:2rem;">Editar: ${p.nome}</h2>
+    <div class="form-grid" style="margin-bottom:1rem;">
+      <div class="field"><label>Nome</label><input id="edit-nome" value="${p.nome}"></div>
+      <div class="field"><label>Tipo</label><select id="edit-tipo">${['Roupa','Acessório','Amigurumi','Casa / Decoração','Brinquedo','Outro'].map(t=>`<option ${p.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem;">
+      <div class="field"><label>Novelos</label><input type="number" id="edit-novelos" value="${p.novelos||''}" min="1" step="0.5"></div>
+      <div class="field"><label>Status</label><select id="edit-status"><option value="planejado" ${p.status==='planejado'?'selected':''}>Planejado</option><option value="em-andamento" ${p.status==='em-andamento'?'selected':''}>Em andamento</option><option value="concluido" ${p.status==='concluido'?'selected':''}>Concluído</option></select></div>
+    </div>
+    <div class="field" style="margin-bottom:1rem;">
+      <label>Cores do fio</label>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;"><input type="text" id="edit-cor-input" placeholder="Adicionar cor..." style="flex:1;"><button class="btn btn-secondary" style="padding:0.7rem 1rem;border-radius:12px;white-space:nowrap;" onclick="adicionarCorEdit(${id})">+ Cor</button></div>
+      <div id="edit-cores-tags" style="display:flex;flex-wrap:wrap;gap:0.4rem;">${coresHtml}</div>
+    </div>
+    <div class="field" style="margin-bottom:1rem;">
+      <label>Foto do projeto</label>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <label for="edit-foto-input" style="text-transform:none;font-size:0.88rem;cursor:pointer;background:var(--warm);padding:0.5rem 1rem;border-radius:50px;color:var(--brown);font-weight:500;display:inline-block;">📷 ${p.foto ? 'Trocar foto' : 'Adicionar foto'}</label>
+        <input type="file" id="edit-foto-input" accept="image/*" style="display:none;" onchange="trocarFotoEdit(this,${id})">
+        ${p.foto ? `<img src="${p.foto}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--warm);cursor:pointer;" onclick="ampliarFoto('${p.foto}')"><button onclick="removerFotoEdit(${id})" style="background:var(--rose);border:none;border-radius:50px;padding:0.3rem 0.7rem;font-size:0.8rem;cursor:pointer;color:white;">✕ Remover</button>` : ''}
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:1rem;"><label>Notas</label><input id="edit-notas" value="${p.notas||''}"></div>
+    <div class="field" style="margin-bottom:1.5rem;"><label>Receita</label><textarea id="edit-receita" rows="6">${p.receita||''}</textarea></div>
+    <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-sage" onclick="salvarEdicao(${id})">💾 Salvar</button>
+      <button class="btn btn-secondary" onclick="abrirDetalhes(${id})">Cancelar</button>
+    </div>`;
+}
+
+function adicionarCorEdit(id) {
+  const p = projects.find(x => x.id === id);
+  const cor = document.getElementById('edit-cor-input').value.trim();
+  if (!cor) return;
+  p.cores = p.cores || []; p.cores.push(cor);
+  document.getElementById('edit-cor-input').value = ''; abrirEdicao(id);
+}
+function removerCorEdit(i, id) { projects.find(x => x.id === id).cores.splice(i,1); abrirEdicao(id); }
+function trocarFotoEdit(input, id) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => { projects.find(x => x.id === id).foto = e.target.result; abrirEdicao(id); };
+  reader.readAsDataURL(input.files[0]);
+}
+function removerFotoEdit(id) { projects.find(x => x.id === id).foto = null; salvar(); abrirEdicao(id); }
+
+function salvarEdicao(id) {
+  const p = projects.find(x => x.id === id);
+  p.nome = document.getElementById('edit-nome').value.trim() || p.nome;
+  p.tipo = document.getElementById('edit-tipo').value;
+  p.novelos = document.getElementById('edit-novelos').value;
+  p.status = document.getElementById('edit-status').value;
+  p.done = p.status === 'concluido';
+  p.notas = document.getElementById('edit-notas').value;
+  p.receita = document.getElementById('edit-receita').value;
+  salvar(); renderProjetos(); abrirDetalhes(id);
+}
+
+
+// ===== CONTADOR =====
+let cntCount = 0;
+let cntHistory = [];
+let cntSessoes = JSON.parse(localStorage.getItem('cnt-sessoes') || '[]');
+
+function cntAdd() {
+  cntCount++;
+  cntHistory.push(cntCount);
+  document.getElementById('cnt-numero').textContent = cntCount;
+  const alarme = parseInt(document.getElementById('cnt-alarme').value) || 10;
+  const aviso = document.getElementById('cnt-aviso');
+  if (cntCount % alarme === 0) {
+    aviso.textContent = `🔔 ${cntCount} fileiras completadas!`;
+    aviso.style.display = 'block';
+    setTimeout(() => aviso.style.display = 'none', 3000);
+  }
+}
+function cntUndo() {
+  if (cntCount <= 0) return;
+  cntCount--; cntHistory.pop();
+  document.getElementById('cnt-numero').textContent = cntCount;
+}
+function cntReset() {
+  if (cntCount > 0 && !confirm('Zerar o contador?')) return;
+  cntCount = 0; cntHistory = [];
+  document.getElementById('cnt-numero').textContent = 0;
+}
+function cntSalvar() {
+  const nome = document.getElementById('cnt-nome').value.trim() || 'Sessão sem nome';
+  cntSessoes.unshift({ id: Date.now(), nome, fileiras: cntCount, data: new Date().toLocaleDateString('pt-BR') });
+  localStorage.setItem('cnt-sessoes', JSON.stringify(cntSessoes));
+  document.getElementById('cnt-nome').value = '';
+  cntRenderHistorico();
+}
+function cntDeleteSessao(id) {
+  cntSessoes = cntSessoes.filter(s => s.id !== id);
+  localStorage.setItem('cnt-sessoes', JSON.stringify(cntSessoes));
+  cntRenderHistorico();
+}
+function cntRenderHistorico() {
+  const el = document.getElementById('cnt-historico');
+  if (!cntSessoes.length) { el.innerHTML = '<div class="empty-state"><span class="emoji">⏱️</span><p>Nenhuma sessão salva ainda</p></div>'; return; }
+  el.innerHTML = cntSessoes.map(s => `
+    <div style="display:flex;align-items:center;gap:1rem;padding:0.8rem 1rem;background:var(--cream);border-radius:12px;border:2px solid var(--warm);margin-bottom:0.6rem;">
+      <div style="flex:1;"><div style="font-weight:500;">${s.nome}</div><div style="font-size:0.8rem;color:var(--text-light);">${s.data}</div></div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--rose-dark);font-weight:700;">${s.fileiras}</div>
+      <span style="font-size:0.8rem;color:var(--text-light);">fileiras</span>
+      <button onclick="cntDeleteSessao(${s.id})" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:1rem;" title="Remover">✕</button>
+    </div>`).join('');
+}
+cntRenderHistorico();
+
+// ===== ESTOQUE =====
+let estoque = JSON.parse(localStorage.getItem('crochet-estoque') || '[]');
+function estSalvar() { localStorage.setItem('crochet-estoque', JSON.stringify(estoque)); }
+
+function estAdicionar() {
+  const nome = document.getElementById('est-nome').value.trim();
+  if (!nome) { alert('Digite o nome ou marca do fio!'); return; }
+  estoque.unshift({ id: Date.now(), nome, cor: document.getElementById('est-cor').value, qtd: document.getElementById('est-qtd').value || 1, metro: document.getElementById('est-metro').value, espessura: document.getElementById('est-espessura').value, notas: document.getElementById('est-notas').value });
+  estSalvar(); estRender();
+  ['est-nome','est-cor','est-qtd','est-metro','est-notas'].forEach(id => document.getElementById(id).value = '');
+}
+function estRemover(id) {
+  estoque = estoque.filter(e => e.id !== id);
+  estSalvar(); estRender();
+}
+function estRender() {
+  const busca = document.getElementById('est-busca').value.toLowerCase();
+  const lista = document.getElementById('est-lista');
+  const count = document.getElementById('est-count');
+  const filtrado = estoque.filter(e => !busca || e.nome.toLowerCase().includes(busca) || e.cor.toLowerCase().includes(busca) || e.espessura.toLowerCase().includes(busca));
+  const totalNovelos = estoque.reduce((s,e) => s + parseFloat(e.qtd||0), 0);
+  count.textContent = estoque.length ? `${estoque.length} tipo${estoque.length>1?'s':''} de fio · ${totalNovelos} novelo${totalNovelos!==1?'s':''} no total` : 'Nenhum item ainda';
+  if (!filtrado.length) { lista.innerHTML = '<div class="empty-state"><span class="emoji">📦</span><p>Nenhum fio encontrado</p></div>'; return; }
+  lista.innerHTML = filtrado.map(e => `
+    <div style="display:flex;align-items:center;gap:1rem;padding:0.9rem 1.1rem;background:var(--cream);border-radius:14px;border:2px solid var(--warm);margin-bottom:0.7rem;">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🧵</div>
+      <div style="flex:1;">
+        <div style="font-weight:500;color:var(--text);">${e.nome} ${e.cor ? '· ' + e.cor : ''}</div>
+        <div style="font-size:0.8rem;color:var(--text-light);">${e.espessura}${e.metro ? ' · ' + e.metro + 'm/novelo' : ''}${e.notas ? ' · ' + e.notas : ''}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--rose-dark);font-weight:700;">${e.qtd}</div>
+        <div style="font-size:0.72rem;color:var(--text-light);">novelo${e.qtd!=1?'s':''}</div>
+      </div>
+      <button onclick="estRemover(${e.id})" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:1rem;" title="Remover">✕</button>
+    </div>`).join('');
+}
+estRender();
+
+// ===== PALETA =====
+let paletaCores = [];
+let paletas = JSON.parse(localStorage.getItem('crochet-paletas') || '[]');
+function palSalvarStorage() { localStorage.setItem('crochet-paletas', JSON.stringify(paletas)); }
+
+function palAddCor() {
+  const nome = document.getElementById('pal-nome-cor').value.trim() || 'Cor ' + (paletaCores.length+1);
+  const hex = document.getElementById('pal-cor-picker').value;
+  paletaCores.push({ nome, hex });
+  document.getElementById('pal-nome-cor').value = '';
+  palRenderCores();
+}
+function palRemoverCor(i) { paletaCores.splice(i,1); palRenderCores(); }
+function palRenderCores() {
+  const el = document.getElementById('pal-cores-atuais');
+  if (!paletaCores.length) { el.innerHTML = '<span style="color:var(--text-light);font-size:0.85rem;">Adicione cores acima para montar sua paleta</span>'; return; }
+  el.innerHTML = paletaCores.map((c,i) => `
+    <div style="display:flex;align-items:center;gap:0.4rem;background:white;border-radius:50px;padding:0.3rem 0.7rem 0.3rem 0.4rem;border:2px solid var(--warm);box-shadow:0 2px 6px var(--shadow);">
+      <div style="width:24px;height:24px;border-radius:50%;background:${c.hex};border:2px solid rgba(0,0,0,0.1);flex-shrink:0;"></div>
+      <span style="font-size:0.82rem;color:var(--text);">${c.nome}</span>
+      <button onclick="palRemoverCor(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.75rem;padding:0;margin-left:0.2rem;">✕</button>
+    </div>`).join('');
+}
+function palSalvar() {
+  if (!paletaCores.length) { alert('Adicione pelo menos uma cor!'); return; }
+  const nome = document.getElementById('pal-nome').value.trim() || 'Paleta ' + (paletas.length+1);
+  paletas.unshift({ id: Date.now(), nome, cores: [...paletaCores] });
+  palSalvarStorage(); palRenderLista();
+  document.getElementById('pal-nome').value = '';
+  palLimpar();
+}
+function palLimpar() { paletaCores = []; palRenderCores(); }
+function palDeletar(id) { paletas = paletas.filter(p => p.id !== id); palSalvarStorage(); palRenderLista(); }
+function palRenderLista() {
+  const el = document.getElementById('pal-lista');
+  const count = document.getElementById('pal-count');
+  count.textContent = paletas.length ? `${paletas.length} paleta${paletas.length>1?'s':''} salva${paletas.length>1?'s':''}` : 'Nenhuma paleta ainda';
+  if (!paletas.length) { el.innerHTML = '<div class="empty-state"><span class="emoji">🎨</span><p>Salve sua primeira paleta acima!</p></div>'; return; }
+  el.innerHTML = paletas.map(p => `
+    <div style="background:var(--cream);border-radius:14px;padding:1rem 1.2rem;border:2px solid var(--warm);margin-bottom:0.8rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;">
+        <div style="font-weight:500;color:var(--text);">${p.nome}</div>
+        <button onclick="palDeletar(${p.id})" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.9rem;" title="Remover">✕</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+        ${p.cores.map(c => `
+          <div style="display:flex;align-items:center;gap:0.35rem;background:white;border-radius:50px;padding:0.25rem 0.6rem 0.25rem 0.35rem;border:1.5px solid var(--warm);">
+            <div style="width:20px;height:20px;border-radius:50%;background:${c.hex};border:1.5px solid rgba(0,0,0,0.1);"></div>
+            <span style="font-size:0.78rem;color:var(--text);">${c.nome}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+palRenderLista();
+palRenderCores();
+
+// ===== GLOSSÁRIO =====
+const glossario = [
+  { abrev:'pb', nome:'Ponto Baixo', desc:'O ponto mais básico do crochê. Insira a agulha, puxe o fio e passe pelas duas alças de uma vez.', dica:'Ideal para amigurumi e bordas.' },
+  { abrev:'pa', nome:'Ponto Alto', desc:'Faça um laçado antes de inserir a agulha. Puxe o fio (3 alças), passe 2 a 2 até restar 1.', dica:'Mais alto que o pb, ótimo para roupas.' },
+  { abrev:'pmc', nome:'Ponto Meia Coluna', desc:'Insira a agulha, puxe o fio e passe pelas 3 alças de uma vez.', dica:'Cria textura densa, bom para bolsas.' },
+  { abrev:'pam', nome:'Ponto Alto Médio', desc:'Um laçado, insira a agulha, puxe o fio (3 alças) e passe tudo de uma vez.', dica:'Tamanho entre pb e pa.' },
+  { abrev:'pto corr', nome:'Ponto Corrente', desc:'O ponto de base. Faça um laçado, puxe o fio pela alça. Repita.', dica:'Usado para montar a base e fazer espaços.' },
+  { abrev:'aum', nome:'Aumento', desc:'Faça 2 pontos no mesmo espaço ou ponto da fileira anterior.', dica:'Para aumentar o número de pontos.' },
+  { abrev:'dim', nome:'Diminuição', desc:'Una 2 pontos em 1: insira a agulha em 2 pontos consecutivos e passe o fio pelos dois de uma vez.', dica:'Para diminuir o número de pontos.' },
+  { abrev:'pm', nome:'Ponto Marcador', desc:'Uma argolinha ou fio colorido colocado entre pontos para marcar o início da fileira ou um ponto específico.', dica:'Essencial para crochê em redondo.' },
+  { abrev:'MR', nome:'Magic Ring / Anel Mágico', desc:'Técnica para começar crochê em redondo sem deixar buraco no centro. Enrole o fio 2x no dedo.', dica:'Usado em amigurumis e flores.' },
+  { abrev:'2pb jun', nome:'2 Pb Juntos', desc:'Diminuição invisível: insira a agulha na frente da alça dos próximos 2 pb e passe o fio pelos dois.', dica:'Cria diminuição quase imperceptível.' },
+  { abrev:'pp', nome:'Ponto Pipoca', desc:'Vários pontos altos incompletos no mesmo ponto, fechados juntos. Cria relevo.', dica:'Lindo em bolsas e detalhes decorativos.' },
+  { abrev:'pc', nome:'Ponto Caranguejo', desc:'Ponto baixo feito da esquerda para a direita (ao contrário). Cria borda resistente e texturizada.', dica:'Perfeito para acabamento de bordas.' },
+  { abrev:'fp/bp', nome:'Ponto em Relevo (frente/verso)', desc:'fp: inserir agulha pela frente do ponto. bp: inserir pela parte de trás. Cria canaletas e texturas.', dica:'Muito usado em costelas e cesto.' },
+  { abrev:'ch', nome:'Cadeia / Corrente', desc:'Série de pontos correntes. A base da maioria dos projetos planos.', dica:'Sempre conte as alças ao montar a base.' },
+];
+
+let glossarioCustom = JSON.parse(localStorage.getItem('glos-custom') || '[]');
+
+function filtrado_todos(lista, busca) {
+  return lista.filter(g => !busca || g.abrev.toLowerCase().includes(busca) || g.nome.toLowerCase().includes(busca) || g.desc.toLowerCase().includes(busca));
+}
+
+function glosRender() {
+  const busca = document.getElementById('glos-busca').value.toLowerCase();
+  const el = document.getElementById('glos-lista');
+  const todos = [...glossario, ...glossarioCustom];
+  if (!filtrado_todos(todos, busca).length) { el.innerHTML = '<div class="empty-state"><span class="emoji">🤔</span><p>Nenhum ponto encontrado</p></div>'; return; }
+  el.innerHTML = filtrado_todos(todos, busca).map(g => `
+    <div style="padding:1rem;background:var(--cream);border-radius:14px;border:2px solid ${g.custom ? 'var(--sage-light)' : 'var(--warm)'};margin-bottom:0.8rem;">
+      <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:0.8rem;">
+          <span style="background:${g.custom ? 'var(--sage)' : 'var(--rose)'};color:white;padding:0.2rem 0.7rem;border-radius:50px;font-size:0.8rem;font-weight:600;white-space:nowrap;">${g.abrev}</span>
+          <span style="font-weight:600;color:var(--brown);font-size:0.95rem;">${g.nome}</span>
+          ${g.custom ? '<span style="font-size:0.72rem;color:var(--sage);background:rgba(122,158,138,0.12);padding:0.15rem 0.5rem;border-radius:50px;">personalizado</span>' : ''}
+        </div>
+        ${g.custom ? `<button onclick="glosRemover(${g.id})" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:0.9rem;" title="Remover">✕</button>` : ''}
+      </div>
+      <p style="font-size:0.88rem;color:var(--text);line-height:1.6;">${g.desc}</p>
+    </div>`).join('');
+}
+glosRender();
+
+function glosAdicionar() {
+  const abrev = document.getElementById('glos-add-abrev').value.trim();
+  const nome = document.getElementById('glos-add-nome').value.trim();
+  const desc = document.getElementById('glos-add-desc').value.trim();
+  if (!abrev || !nome || !desc) { alert('Preencha abreviação, nome e descrição!'); return; }
+  glossarioCustom.unshift({ id: Date.now(), abrev, nome, desc, custom: true });
+  localStorage.setItem('glos-custom', JSON.stringify(glossarioCustom));
+  document.getElementById('glos-add-abrev').value = '';
+  document.getElementById('glos-add-nome').value = '';
+  document.getElementById('glos-add-desc').value = '';
+  document.getElementById('glos-form').style.display = 'none';
+  glosRender();
+}
+function glosRemover(id) {
+  glossarioCustom = glossarioCustom.filter(g => g.id !== id);
+  localStorage.setItem('glos-custom', JSON.stringify(glossarioCustom));
+  glosRender();
+}
+function glosToggleForm() {
+  const form = document.getElementById('glos-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function fecharModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function fecharModalFora(e) { if (e.target.id === 'modal-overlay') fecharModal(); }
+
+renderProjetos();
+</script>
+</body>
+</html>

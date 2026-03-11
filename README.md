@@ -62,13 +62,12 @@ cd crochet-calc
 
 ## 👩‍💻 Sobre
 
-Desenvolvido por **Isabella Macedo Gustafson** — estudante de Bacharelado em Matemática Computacional na UFF (Rio das Ostras, RJ) e crocheteira.
+Desenvolvido por **Isabella Macedo Gustafson**, estudante de Bacharelado em Matemática Computacional na Universidade Federal Fluminense e crocheteira. 
+(Rio das Ostras, RJ)
 
 O projeto nasceu da necessidade real de ter um lugar organizado para guardar receitas, calcular materiais e nunca mais perder o controle dos projetos em andamento.
 
-📧 isabella.macedo.gustafson@gmail.com  
-💼 [LinkedIn](https://www.linkedin.com/in/isabella-macedo-gustafson)  
-🐙 [GitHub](https://github.com/imgustafson)
 
 ---
+
 

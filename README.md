@@ -2,7 +2,7 @@
 
 > Aplicativo web para crocheteiras organizarem projetos, calcularem materiais e consultarem referências, tudo em um lugar só.
 
-**🌐 Acesse online:** [imgustafson.github.io/crochet-calc](https://imgustafson.github.io/crochet-calc)
+**🌐 Acesse online:** [imgustafson.github.io/studio_de_croche](https://imgustafson.github.io/studio_de_croche/)
 
 ---
 
@@ -49,12 +49,12 @@ Redimensione receitas de PP até XGG com fator de conversão automático para po
 ## Como usar
 
 **Opção 1 — Online**
-Acesse diretamente pelo link: [imgustafson.github.io/crochet-calc](https://imgustafson.github.io/crochet-calc)
+Acesse diretamente pelo link: [imgustafson.github.io/studio_de_croche](https://imgustafson.github.io/studio_de_croche/)
 
 **Opção 2 — Local**
 ```bash
-git clone https://github.com/imgustafson/crochet-calc.git
-cd crochet-calc
+git clone https://github.com/imgustafson/studio_de_croche.git
+cd studio_de_croche
 # Abra o index.html no navegador, ou use Live Server no VS Code
 ```
 
@@ -69,5 +69,6 @@ O projeto nasceu da necessidade real de ter um lugar organizado para guardar rec
 
 
 ---
+
 
 
